@@ -172,9 +172,34 @@
             }, 300);
         }
          // 🌟 音乐播放功能
-         const audio = new Audio('music/love.mp3'); // 修改音乐文件路径
+        const audio = new Audio('music/love.mp3');
+        audio.preload = "auto";
         let isPlaying = false;
+        let audioLoaded = false;
+         
+        audio.addEventListener('canplaythrough', () => {
+            audioLoaded = true;
+            document.getElementById('music-title').innerHTML = '我们俩 - 准备就绪';
+        });
 
+        audio.addEventListener('error', (e) => {
+            console.error('音乐加载失败:', e.target.error);
+            document.getElementById('music-title').innerHTML = '❌ 音乐加载失败';
+        });
+
+        // 用户交互处理
+        const initPlay = () => {
+            document.getElementById('play-tip').remove();
+            if(audioLoaded) {
+                audio.play().catch(() => {
+                    alert('请再次点击页面以播放音乐');
+                });
+            }
+        }
+
+        document.body.addEventListener('click', initPlay, { once: true });
+
+        // 音乐控制
         document.getElementById('music-control').addEventListener('click', () => {
             if(isPlaying) {
                 audio.pause();
@@ -186,14 +211,6 @@
             isPlaying = !isPlaying;
             document.getElementById('music-control').textContent = isPlaying ? '⏸' : '▶';
         });
-
-        // 尝试自动播放（需要用户交互）
-        document.body.addEventListener('click', () => {
-            audio.play().then(() => {
-                isPlaying = true;
-                document.getElementById('music-control').textContent = '⏸';
-            });
-        }, { once: true });
        
         function createPetals() {
             setInterval(() => {
